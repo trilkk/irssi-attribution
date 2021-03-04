@@ -4,17 +4,17 @@ Extracts attribution information from bridge bots to make it seem as if the user
 
 ## Usage
 
-Clone this repository somewhere in your home directory. Let's assume directly at `~`:
+Clone this repository somewhere in your home directory. Let's assume directly at `~/`:
 
     cd ~
     git clone https://github.com/trilkk/irssi-attribution.git
 
-Go to `.irssi/scripts` and enable the script:
+Go to `.irssi/scripts/` and enable the script:
 
     cd ~/.irssi/scripts
     ln -s ../../irssi-attribution/attribution.pl
 
-To enable the script automatically, add it to `~/.irssi/scripts/autorun`:
+To enable the script automatically, add it to `~/.irssi/scripts/autorun/`:
 
     cd ~/.irssi/scripts/autorun
     ln -s ../attribution.pl
