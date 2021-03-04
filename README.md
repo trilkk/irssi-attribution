@@ -9,7 +9,7 @@ Clone this repository somewhere in your home directory. Let's assume directly at
     cd ~
     git clone https://github.com/trilkk/irssi-attribution.git
 
-Go to `.irssi/scripts/autorun` and enable the script:
+Go to `.irssi/scripts` and enable the script:
 
     cd ~/.irssi/scripts
     ln -s ../../irssi-attribution/attribution.pl
