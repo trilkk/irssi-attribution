@@ -11,8 +11,13 @@ Clone this repository somewhere in your home directory. Let's assume directly at
 
 Go to `.irssi/scripts/autorun` and enable the script:
 
+    cd ~/.irssi/scripts
+    ln -s ../../irssi-attribution/attribution.pl
+
+To enable the script automatically, add it to `~/.irssi/scripts/autorun`:
+
     cd ~/.irssi/scripts/autorun
-    ln -s ../../../irssi-attribution/attribution.pl
+    ln -s ../attribution.pl
 
 ## Settings
 
