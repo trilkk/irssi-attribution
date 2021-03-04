@@ -23,13 +23,23 @@ my $input_block = 0;
 # Functions ############################
 ########################################
 
+# Gets the listing of attributors.
+# \return List of attributors.
+sub get_attributors
+{
+    my $attributors = Irssi::settings_get_str('attribution_attributors');
+    $attributors =~ s/^\s+//;
+    $attributors =~ s/\s+$//;
+    return split /\s/, $attributors;
+}
+
 # Checks if given party is a legal attributor.
 # \param 0 Nick to test.
 # \return True if valid attributor, false otherwise.
 sub is_attributor
 {
     my $nick = $_[0];
-    my @attributors = split /\s/, Irssi::settings_get_str('attribution_attributors');
+    my @attributors = get_attributors();
     foreach my $ii (@attributors)
     {
         if($nick eq $ii)
@@ -82,14 +92,14 @@ sub attribution_input
     {
         my $indicator = Irssi::settings_get_str('attribution_indicator');
         $input_block = 1;
-        Irssi::signal_emit($signal, $param0, $modified, $attr . $indicator, $param3, $param4);
+        Irssi::signal_emit($signal, $server, $modified, $attr . $indicator, $param3, $param4);
         Irssi::signal_stop();
         $input_block = 0;
         return;
     }
 
     $input_block = 1;
-    Irssi::signal_emit($signal, $param0, $msg, $nick, $param3, $param4);
+    Irssi::signal_emit($signal, $server, $msg, $nick, $param3, $param4);
     Irssi::signal_stop();
     $input_block = 0;
 }
