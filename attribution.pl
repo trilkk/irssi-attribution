@@ -3,7 +3,6 @@
 ########################################
 
 use strict;
-use Encode ();
 use Irssi;
 use vars qw($VERSION %IRSSI);
 $VERSION = 'r2';
