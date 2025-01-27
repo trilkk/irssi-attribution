@@ -49,15 +49,19 @@ sub is_attributor
     return 0;
 }
 
-# Strip color codes from a potential IRC nickname.
+# Strip any unnecessary extra elements from a nickname.
+# In practice, color codes and username indicators.
 # \param 0 Input string.
 # \return Input string without color codes.
-sub strip_color
+sub strip_nick
 {
     my $nick = $_[0];
+    # Strip color codes.
     $nick =~ s/\cC\d+(,\d+)?//g;
     $nick =~ s/\cC//g;
     $nick =~ s/\cO//g;
+    # Strip matrix user indicator.
+    $nick =~ s/\s\(@\w+:\w+\.(\w+\.)+\w+\)//g;
     return $nick;
 }
 
@@ -84,7 +88,7 @@ sub attribution_input
 
     $msg =~ /^(PRIVMSG\s#\S+\s:)<([^>]+)>\s+(.*)$/;
     my $modified = $1 . $3;
-    my $attr = strip_color($2);
+    my $attr = strip_nick($2);
 
     # Only certain attributors are allowed.
     if($attr && is_attributor($nick))
