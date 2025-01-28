@@ -86,21 +86,33 @@ sub attribution_input
     my ($server, $msg, $nick, $param3, $param4) = @_;
     my $signal = Irssi::signal_get_emitted();
 
-    $msg =~ /^(PRIVMSG\s#\S+\s:)<([^>]+)>\s+(.*)$/;
-    my $modified = $1 . $3;
-    my $attr = strip_nick($2);
-
-    # Only certain attributors are allowed.
-    if($attr && is_attributor($nick))
+    if(is_attributor($nick))
     {
-        my $indicator = Irssi::settings_get_str('attribution_indicator');
+        $msg =~ /^(PRIVMSG\s#\S+\s:)<([^>]+)>\s+(.*)$/;
+        my $modified = $1 . $3;
+        my $extracted = strip_nick($2);
+
+        # Someone is being attributed.
+        if($modified && $extracted)
+        {
+            my $indicator = Irssi::settings_get_str('attribution_indicator');
+            $input_block = 1;
+            Irssi::signal_emit($signal, $server, $modified, $extracted . $indicator, $param3, $param4);
+            Irssi::signal_stop();
+            $input_block = 0;
+            return;
+        }
+
+        # Continuing from linefeed or the like.
+        my $continuation = Irssi::settings_get_str('attribution_continuation');
         $input_block = 1;
-        Irssi::signal_emit($signal, $server, $modified, $attr . $indicator, $param3, $param4);
+        Irssi::signal_emit($signal, $server, $msg, $continuation, $param3, $param4);
         Irssi::signal_stop();
         $input_block = 0;
         return;
     }
 
+    # Pass message without modification.
     $input_block = 1;
     Irssi::signal_emit($signal, $server, $msg, $nick, $param3, $param4);
     Irssi::signal_stop();
@@ -112,6 +124,7 @@ sub attribution_input
 ########################################
 
 Irssi::settings_add_str('misc', 'attribution_attributors', '^tg^');
+Irssi::settings_add_str('misc', 'attribution_continuation', '…');
 Irssi::settings_add_str('misc', 'attribution_indicator', '⇋');
 
 Irssi::signal_add_first('server event', 'attribution_input');

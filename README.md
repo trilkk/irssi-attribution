@@ -24,17 +24,21 @@ To enable the script automatically, add it to `~/.irssi/scripts/autorun/`:
 The script provides the following settings:
 
     attribution_attributors : str
+    attribution_continuation : str
     attribution_indicator : str
 
 `attribution_attributors` is a whitespace-separated list of names that should be considered legitimate attributors. IRC does not support whitespace in usernames, so this is a valid restriction.
 
-`attribution_indicator` is a character appended to nicknames from behind bridges. The indicator may be an empty string.
+`attribution_continuation` is a character used as a replacement for a nickname when an attributor is speaking without attributing anyone. This is a typical case for successive lines of multiline messages. May be an empty string.
+
+`attribution_indicator` is a character appended to nicknames from behind bridges. May be an empty string.
 
 Example addition to `~/.irssi/config`:
 
     settings = {
         "perl/core/scripts" = {
             attribution_attributors = "^tg^ ^tg^1";
+            attribution_continuation = "…";
             attribution_indicator = "⇋";
         };
     };
