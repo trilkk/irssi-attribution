@@ -18,6 +18,9 @@ $VERSION = 'r2';
 # Block for reacting to the same signal twice.
 my $input_block = 0;
 
+# Padding length for continuatio.
+my $continuation_pad_length = 0;
+
 ########################################
 # Functions ############################
 ########################################
@@ -96,6 +99,7 @@ sub attribution_input
         if($modified && $extracted)
         {
             my $indicator = Irssi::settings_get_str('attribution_indicator');
+            $continuation_pad_length = length($extracted);
             $input_block = 1;
             Irssi::signal_emit($signal, $server, $modified, $extracted . $indicator, $param3, $param4);
             Irssi::signal_stop();
@@ -104,7 +108,16 @@ sub attribution_input
         }
 
         # Continuing from linefeed or the like.
-        my $continuation = Irssi::settings_get_str('attribution_continuation');
+        my $continuation = "";
+        my $continuation_pad = Irssi::settings_get_str('attribution_continuation_pad');
+        if($continuation_pad)
+        {
+            while(length($continuation) < $continuation_pad_length)
+            {
+                $continuation .= $continuation_pad;
+            }
+        }
+        $continuation .= Irssi::settings_get_str('attribution_continuation');
         $input_block = 1;
         Irssi::signal_emit($signal, $server, $msg, $continuation, $param3, $param4);
         Irssi::signal_stop();
@@ -125,6 +138,7 @@ sub attribution_input
 
 Irssi::settings_add_str('misc', 'attribution_attributors', '^tg^');
 Irssi::settings_add_str('misc', 'attribution_continuation', '…');
+Irssi::settings_add_str('misc', 'attribution_continuation_pad', "");
 Irssi::settings_add_str('misc', 'attribution_indicator', '⇋');
 
 Irssi::signal_add_first('server event', 'attribution_input');
