@@ -90,50 +90,46 @@ sub attribution_input
     my $signal = Irssi::signal_get_emitted();
 
     # Only PRIVMSG gets modified.
-    $msg =~ /^(PRIVMSG\s#\S+\s:)(.*)$/;
-    my $privmsg = $1;
-    my $content = $2;
-
-    if($privmsg && is_attributor($nick))
+    if(is_attributor($nick) && ($msg =~ /^(PRIVMSG\s#\S+\s:)(.*)$/))
     {
-        $content =~ /^<([^>]+)>\s+(.*)$/;
-        my $modified = $privmsg . $2;
-        my $extracted = strip_nick($1);
+        my $privmsg = $1;
+        my $content = $2;
 
         # Someone is being attributed.
-        if($modified && $extracted)
+        if($content =~ /^<([^>]+)>\s+(.*)$/)
         {
+            my $modified = $privmsg . $2;
+            my $extracted = strip_nick($1);
             utf8::decode($extracted);
             $continuation_pad_length = length($extracted);
             my $indicator = Irssi::settings_get_str('attribution_indicator');
             utf8::decode($indicator);
-            my $nick = $extracted . $indicator;
-            utf8::encode($nick);
+            my $outname = $extracted . $indicator;
+            utf8::encode($outname);
             $input_block = 1;
-            Irssi::signal_emit($signal, $server, $modified, $nick, $param3, $param4);
+            Irssi::signal_emit($signal, $server, $modified, $outname, $param3, $param4);
             Irssi::signal_stop();
             $input_block = 0;
             return;
         }
 
         # Continuing from linefeed or the like.
-        my $nick = '';
-        utf8::decode($nick);
+        my $outname = '';
         my $continuation_pad = Irssi::settings_get_str('attribution_continuation_pad');
         utf8::decode($continuation_pad);
         if($continuation_pad)
         {
-            while(length($nick) < $continuation_pad_length)
+            while(length($outname) < $continuation_pad_length)
             {
-                $nick .= $continuation_pad;
+                $outname .= $continuation_pad;
             }
         }
         my $continuation = Irssi::settings_get_str('attribution_continuation');
         utf8::decode($continuation);
-        $nick .= $continuation;
-        utf8::encode($nick);
+        $outname .= $continuation;
+        utf8::encode($outname);
         $input_block = 1;
-        Irssi::signal_emit($signal, $server, $msg, $nick, $param3, $param4);
+        Irssi::signal_emit($signal, $server, $msg, $outname, $param3, $param4);
         Irssi::signal_stop();
         $input_block = 0;
         return;
