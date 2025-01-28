@@ -89,11 +89,16 @@ sub attribution_input
     my ($server, $msg, $nick, $param3, $param4) = @_;
     my $signal = Irssi::signal_get_emitted();
 
-    if(is_attributor($nick))
+    # Only PRIVMSG gets modified.
+    $msg =~ /^(PRIVMSG\s#\S+\s:)(.*)$/;
+    my $privmsg = $1;
+    my $content = $2;
+
+    if($privmsg && is_attributor($nick))
     {
-        $msg =~ /^(PRIVMSG\s#\S+\s:)<([^>]+)>\s+(.*)$/;
-        my $modified = $1 . $3;
-        my $extracted = strip_nick($2);
+        $content =~ /^<([^>]+)>\s+(.*)$/;
+        my $modified = $privmsg . $2;
+        my $extracted = strip_nick($1);
 
         # Someone is being attributed.
         if($modified && $extracted)
@@ -112,7 +117,7 @@ sub attribution_input
         }
 
         # Continuing from linefeed or the like.
-        my $nick = "";
+        my $nick = '';
         utf8::decode($nick);
         my $continuation_pad = Irssi::settings_get_str('attribution_continuation_pad');
         utf8::decode($continuation_pad);
