@@ -98,28 +98,37 @@ sub attribution_input
         # Someone is being attributed.
         if($modified && $extracted)
         {
-            my $indicator = Irssi::settings_get_str('attribution_indicator');
+            utf8::decode($extracted);
             $continuation_pad_length = length($extracted);
+            my $indicator = Irssi::settings_get_str('attribution_indicator');
+            utf8::decode($indicator);
+            my $nick = $extracted . $indicator;
+            utf8::encode($nick);
             $input_block = 1;
-            Irssi::signal_emit($signal, $server, $modified, $extracted . $indicator, $param3, $param4);
+            Irssi::signal_emit($signal, $server, $modified, $nick, $param3, $param4);
             Irssi::signal_stop();
             $input_block = 0;
             return;
         }
 
         # Continuing from linefeed or the like.
-        my $continuation = "";
+        my $nick = "";
+        utf8::decode($nick);
         my $continuation_pad = Irssi::settings_get_str('attribution_continuation_pad');
+        utf8::decode($continuation_pad);
         if($continuation_pad)
         {
-            while(length($continuation) < $continuation_pad_length)
+            while(length($nick) < $continuation_pad_length)
             {
-                $continuation .= $continuation_pad;
+                $nick .= $continuation_pad;
             }
         }
-        $continuation .= Irssi::settings_get_str('attribution_continuation');
+        my $continuation = Irssi::settings_get_str('attribution_continuation');
+        utf8::decode($continuation);
+        $nick .= $continuation;
+        utf8::encode($nick);
         $input_block = 1;
-        Irssi::signal_emit($signal, $server, $msg, $continuation, $param3, $param4);
+        Irssi::signal_emit($signal, $server, $msg, $nick, $param3, $param4);
         Irssi::signal_stop();
         $input_block = 0;
         return;
